@@ -23,7 +23,7 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic topic1() {
+    public NewTopic gradeSupplyingTopic() {
         return new NewTopic("grade-supplier", 1, (short) 1);
     }
 }

@@ -7,18 +7,18 @@ import com.schoolmodel.model.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SupplyingService {
     private static List<String> subjects = List.of("Math", "History", "Art", "English");
     private static List<Integer> grades = List.of(1, 2, 3, 4, 5);
-    private RestTemplate rt = new RestTemplate();
     private final KafkaTemplate<String, GradeRaw> kafkaTemplate;
     private static final Logger log = LoggerFactory.getLogger(SupplyingService.class);
 
@@ -29,31 +29,8 @@ public class SupplyingService {
         this.studentRepository = studentRepository;
     }
 
-
-//    @Scheduled(cron = "0 */1 * ? * *")
-//    public void scheduledSupplier() {
-
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Content-Type", "application/json");
-//        HttpEntity<GradeRaw> requestEntity = new HttpEntity<>(grade, headers);
-//        String url = "http://localhost:9000/school/add-raw-grade";
-//        ResponseEntity<String> response = rt.exchange(
-//                url,
-//                HttpMethod.POST,
-//                requestEntity,
-//                String.class
-//        );
-//
-//        if (response.getStatusCode().is2xxSuccessful()) {
-//            log.info("Request was successful: " + response.getBody());
-//        } else {
-//            log.error("Request failed with status: " + response.getStatusCode());
-//        }
-//    }
-
     @Scheduled(cron = "*/15 * * * * *")
     public void scheduledSupplier() {
-        int i = 0;
         log.info("[Executing scheduled task]");
         List<String> studentCodes = studentRepository.findAll().stream().map(Student::getCode).toList();
         int codesCount = studentCodes.size();
@@ -74,6 +51,7 @@ public class SupplyingService {
 
 
     public void sendMessage(GradeRaw grade) {
-        kafkaTemplate.send("grade-supplier", grade);
+        //TODO: find out more about CompletableFuture object
+        CompletableFuture<SendResult<String, GradeRaw>> result = kafkaTemplate.send("grade-supplier", grade);
     }
 }
