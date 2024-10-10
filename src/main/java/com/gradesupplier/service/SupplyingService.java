@@ -35,6 +35,7 @@ public class SupplyingService {
         List<String> studentCodes = studentRepository.findAll().stream().map(Student::getCode).toList();
         int codesCount = studentCodes.size();
         log.debug("Number of codes found: {}", codesCount);
+
         Random random = new Random();
 
         int randomGrade = grades.get(random.nextInt(grades.size() - 1));
