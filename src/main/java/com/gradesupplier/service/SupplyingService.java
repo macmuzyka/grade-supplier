@@ -40,11 +40,11 @@ public class SupplyingService {
         log.debug("Number of codes found: {}", codesCount);
 
         Random random = new Random();
-
-        int randomGrade = grades.get(random.nextInt(grades.size() - 1));
-
-        String randomSubject = subjects.get(random.nextInt(subjects.size() - 1));
+        int randomGrade = grades.get(random.nextInt(grades.size()));
+        String randomSubject = subjects.get(random.nextInt(subjects.size()));
         String randomStudentCode = studentCodes.get(random.nextInt(codesCount));
+
+
         log.info("[Random grade: {} Random Subject: {} Random code: {}]", randomGrade, randomSubject, randomStudentCode);
         GradeRaw grade = new GradeRaw(randomGrade,
                 randomSubject,
@@ -52,7 +52,6 @@ public class SupplyingService {
         );
         sendMessage(grade);
     }
-
 
     public void sendMessage(GradeRaw grade) {
         //TODO: find out more about CompletableFuture object
