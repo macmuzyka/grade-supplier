@@ -6,6 +6,7 @@ import com.schoolmodel.model.GradeRaw;
 import com.schoolmodel.model.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,8 +18,10 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SupplyingService {
-    private static List<String> subjects = List.of("Math", "History", "Art", "English");
-    private static List<Integer> grades = List.of(1, 2, 3, 4, 5);
+    @Value("#{'${available.subjects}'.split(',')}")
+    private List<String> subjects;
+    @Value("#{'${available.grades}'.split(',')}")
+    private List<Integer> grades;
     private final KafkaTemplate<String, GradeRaw> kafkaTemplate;
     private static final Logger log = LoggerFactory.getLogger(SupplyingService.class);
 
@@ -42,7 +45,7 @@ public class SupplyingService {
 
         String randomSubject = subjects.get(random.nextInt(subjects.size() - 1));
         String randomStudentCode = studentCodes.get(random.nextInt(codesCount));
-        log.info("Random grade: {}\nRandom Subject: {}\nRandom code: {}", randomGrade, randomSubject, randomStudentCode);
+        log.info("[Random grade: {} Random Subject: {} Random code: {}]", randomGrade, randomSubject, randomStudentCode);
         GradeRaw grade = new GradeRaw(randomGrade,
                 randomSubject,
                 randomStudentCode
