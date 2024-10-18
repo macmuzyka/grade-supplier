@@ -37,6 +37,9 @@ public class SupplyingService {
         log.info("[Executing scheduled task]");
         List<String> studentCodes = studentRepository.findAll().stream().map(Student::getCode).toList();
         int codesCount = studentCodes.size();
+        if (codesCount < 1) {
+            throw new IllegalArgumentException("No students found in database thus grade will not be sent!");
+        }
         log.debug("Number of codes found: {}", codesCount);
 
         Random random = new Random();
