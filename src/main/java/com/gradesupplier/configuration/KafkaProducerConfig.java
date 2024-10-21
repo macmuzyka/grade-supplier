@@ -1,6 +1,6 @@
 package com.gradesupplier.configuration;
 
-import com.schoolmodel.model.GradeRaw;
+import com.schoolmodel.model.entity.GradeRaw;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,6 +1,6 @@
 package com.gradesupplier;
 
-import com.schoolmodel.model.Student;
+import com.schoolmodel.model.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -2,8 +2,8 @@ package com.gradesupplier.service;
 
 import com.gradesupplier.StudentRepository;
 
-import com.schoolmodel.model.GradeRaw;
-import com.schoolmodel.model.Student;
+import com.schoolmodel.model.entity.GradeRaw;
+import com.schoolmodel.model.entity.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
