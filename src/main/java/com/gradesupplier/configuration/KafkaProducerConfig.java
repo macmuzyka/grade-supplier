@@ -1,6 +1,6 @@
 package com.gradesupplier.configuration;
 
-import com.schoolmodel.model.entity.GradeRaw;
+import com.schoolmodel.model.entity.GradeDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ public class KafkaProducerConfig {
     private String bootstrapAddress;
 
     @Bean
-    public ProducerFactory<String, GradeRaw> gradeProducerFactory() {
+    public ProducerFactory<String, GradeDto> gradeProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -29,7 +29,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, GradeRaw> gradeKafkaTemplate() {
+    public KafkaTemplate<String, GradeDto> gradeKafkaTemplate() {
         return new KafkaTemplate<>(gradeProducerFactory());
     }
 }

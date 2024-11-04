@@ -2,7 +2,7 @@ package com.gradesupplier.service;
 
 import com.gradesupplier.StudentRepository;
 
-import com.schoolmodel.model.entity.GradeRaw;
+import com.schoolmodel.model.entity.GradeDto;
 import com.schoolmodel.model.entity.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,42 +22,52 @@ public class SupplyingService {
     private List<String> subjects;
     @Value("#{'${available.grades}'.split(',')}")
     private List<Integer> grades;
-    private final KafkaTemplate<String, GradeRaw> kafkaTemplate;
+    private final KafkaTemplate<String, GradeDto> kafkaTemplate;
     private static final Logger log = LoggerFactory.getLogger(SupplyingService.class);
-
     private final StudentRepository studentRepository;
+    private final Random randomizer = new Random();
 
-    public SupplyingService(KafkaTemplate<String, GradeRaw> kafkaTemplate, StudentRepository studentRepository) {
+    public SupplyingService(KafkaTemplate<String, GradeDto> kafkaTemplate, StudentRepository studentRepository) {
         this.kafkaTemplate = kafkaTemplate;
         this.studentRepository = studentRepository;
     }
 
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "*/60 * * * * *")
     public void scheduledSupplier() {
         log.info("[Executing scheduled task]");
         List<String> studentCodes = studentRepository.findAll().stream().map(Student::getCode).toList();
-        int codesCount = studentCodes.size();
-        if (codesCount < 1) {
+        if (studentCodes.isEmpty()) {
             throw new IllegalArgumentException("No students found in database thus grade will not be sent!");
         }
-        log.debug("Number of codes found: {}", codesCount);
+        log.debug("Number of codes found: {}", studentCodes.size());
+        String randomStudentCode = getRandomStudentCode(studentCodes);
+        sendRandomGradeToEachStudentsSubject(randomStudentCode);
 
-        Random random = new Random();
-        int randomGrade = grades.get(random.nextInt(grades.size()));
-        String randomSubject = subjects.get(random.nextInt(subjects.size()));
-        String randomStudentCode = studentCodes.get(random.nextInt(codesCount));
-
-
-        log.info("[Random grade: {} Random Subject: {} Random code: {}]", randomGrade, randomSubject, randomStudentCode);
-        GradeRaw grade = new GradeRaw(randomGrade,
-                randomSubject,
-                randomStudentCode
-        );
-        sendMessage(grade);
     }
 
-    public void sendMessage(GradeRaw grade) {
-        //TODO: find out more about CompletableFuture object
-        CompletableFuture<SendResult<String, GradeRaw>> result = kafkaTemplate.send("grade-supplier", grade);
+    private void sendRandomGradeToEachStudentsSubject(String randomStudentCode) {
+        for (String subject : subjects) {
+            int randomGrade = getRandomGrade();
+            log.info("[Random grade: {} Current Subject: {} Random code: {}]", randomGrade, subject, randomStudentCode);
+
+            GradeDto grade = new GradeDto(randomGrade,
+                    subject,
+                    randomStudentCode
+            );
+            sendViaKafka(grade);
+        }
+    }
+
+    private String getRandomStudentCode(List<String> studentCodes) {
+        return studentCodes.get(randomizer.nextInt(studentCodes.size()));
+    }
+
+    private int getRandomGrade() {
+        return grades.get(randomizer.nextInt(grades.size()));
+    }
+
+    public void sendViaKafka(GradeDto grade) {
+        String topic = grade.getSubject().toLowerCase() + "-grade-supplier";
+        CompletableFuture<SendResult<String, GradeDto>> result = kafkaTemplate.send(topic, grade);
     }
 }
