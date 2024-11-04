@@ -23,7 +23,24 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic gradeSupplyingTopic() {
-        return new NewTopic("grade-supplier", 1, (short) 1);
+    public NewTopic mathGradeSupplyingTopic() {
+        return new NewTopic("math-grade-supplier", 1, (short) 1);
     }
+
+    @Bean
+    public NewTopic historyGradeSupplyingTopic() {
+        return new NewTopic("history-grade-supplier", 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic englishGradeSupplyingTopic() {
+        return new NewTopic("english-grade-supplier", 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic artGradeSupplyingTopic() {
+        return new NewTopic("art-grade-supplier", 1, (short) 1);
+    }
+
+
 }
